@@ -178,14 +178,18 @@ static inline hipblasStatus_t cublasLtMatmulAlgoGetHeuristic(
 
 // --- cooperative_groups::reduce / plus ---
 // HIP's cooperative_groups ships tiled_partition/thread_block_tile and shfl_xor
-// but not the CUDA cg::reduce free function nor cg::plus. Provide them here. The
-// reduction walks tile.size() (32 for the logical tiles the kernels use), so it
+// but not the CUDA cg::reduce free function. cg::plus was absent before ROCm 7.14;
+// guard it so we do not redefine it on newer SDKs that ship it natively.
+// The reduction walks tile.size() (32 for the logical tiles the kernels use), so it
 // is correct on both wave32 and wave64 wavefronts.
 #include <hip/hip_cooperative_groups.h>
 namespace cooperative_groups {
+// HIP_VERSION = MAJOR*10000000 + MINOR*100000 + PATCH; 7.14.x >= 71400000.
+#if !defined(HIP_VERSION) || (HIP_VERSION < 71400000)
 template <typename T> struct plus {
     __device__ __forceinline__ T operator()(const T& a, const T& b) const { return a + b; }
 };
+#endif
 // CUDA cg::reduce is an all-reduce: every lane receives the full result. Use a
 // butterfly (shfl_xor) over tile.size() (32 for the logical tiles here) so the
 // result is identical in all lanes on both wave32 and wave64.
