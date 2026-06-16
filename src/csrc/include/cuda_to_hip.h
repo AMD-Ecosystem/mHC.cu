@@ -114,7 +114,7 @@ static inline hipError_t cudaFuncSetAttribute(FuncT func, hipFuncAttribute attr,
 // hipBLASLt does not honor HIPBLASLT_ORDER_ROW the way cuBLASLt does, so the
 // kernels' row-major matmuls produce wrong results. We instead run hipBLASLt in
 // its native column-major mode. The identity used: a row-major layout (r,c,ld)
-// is bit-identical to a column-major layout (c,r,ld) (the transpose view). So
+// is identical to a column-major layout (c,r,ld) (the transpose view). So
 // cublasLtMatrixLayoutCreate swaps rows<->cols, the ORDER_ROW set-attribute is
 // dropped (left COL), and cublasLtMatmul swaps the A/B operands together with
 // their TRANSA/TRANSB so that C = op(A)*op(B) still lands in row-major C. This is
