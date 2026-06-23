@@ -19,9 +19,9 @@ target_include_directories(mhc_kernels INTERFACE
 )
 
 if(USE_HIP)
-    if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
-        set(CMAKE_HIP_ARCHITECTURES gfx90a)
-    endif()
+    # project(... LANGUAGES CXX HIP) above already honored an explicit
+    # -DCMAKE_HIP_ARCHITECTURES, otherwise auto-detected the host GPU(s), and
+    # otherwise errored on a build host with no AMD GPU.
     find_package(hip REQUIRED)
     find_package(hipblas REQUIRED)
     find_package(hipblaslt REQUIRED)
